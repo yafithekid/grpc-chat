@@ -37,7 +37,7 @@ service ChatService {
     rpc leave (LeaveRequest) returns (Response);
     rpc send (SendRequest) returns (Response);
     rpc sendAll (SendAllRequest) returns (Response);
-    rpc recvAll (RecvAllRequest) returns (Response);
+    rpc recvAll (RecvAllRequest) returns (ChatResponse);
 
 }
 
