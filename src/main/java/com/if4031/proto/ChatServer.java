@@ -14,11 +14,20 @@ public class ChatServer {
     /* The port on which the server should run */
     private int port = 50051;
     private ServerImpl server;
+    private ChatServiceGrpc.ChatService impl;
 
-    private void start() throws Exception {
-        MongoClient mongoClient = new MongoClient("localhost",27017);
+    public ChatServer(ChatServiceGrpc.ChatService service) {
+        this(service,50051);
+    }
+
+    public ChatServer (ChatServiceGrpc.ChatService service,int port) {
+        this.impl = service;
+        this.port = port;
+    }
+
+    public void start() throws Exception {
         server = NettyServerBuilder.forPort(port)
-                .addService(ChatServiceGrpc.bindService(new ChatServiceImpl(mongoClient.getDB("if4031"))))
+                .addService(ChatServiceGrpc.bindService(impl))
                 .build().start();
         logger.info("Server started, listening on " + port);
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -32,7 +41,7 @@ public class ChatServer {
         });
     }
 
-    private void stop() {
+    public void stop() {
         if (server != null) {
             server.shutdown();
         }
@@ -42,7 +51,9 @@ public class ChatServer {
      * Main launches the server from the command line.
      */
     public static void main(String[] args) throws Exception {
-        final ChatServer server = new ChatServer();
+        MongoClient mongoClient = new MongoClient("localhost",27017);
+        ChatServiceGrpc.ChatService impl = new ChatServiceImpl(mongoClient.getDB("if4031"));
+        final ChatServer server = new ChatServer(impl);
         server.start();
     }
 }
