@@ -7,7 +7,7 @@ import com.mongodb.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChatServiceImpl implements ChatServiceGrpc.ChatServiceBlockingClient {
+public class ChatServiceImpl implements ChatServiceGrpc.ChatService {
     //DB Schema
     //{_id,nickname,channel,content,timestamp}
     static final String MESSAGE_COLLECTION_NAME = "messages";
@@ -22,7 +22,6 @@ public class ChatServiceImpl implements ChatServiceGrpc.ChatServiceBlockingClien
         createIndex();
     }
 
-    @Override
     public com.if4031.proto.Rpcchat.Response join(com.if4031.proto.Rpcchat.JoinRequest request) {
         String nickname = request.getNickname();
         String channel = request.getChannel();
@@ -48,7 +47,6 @@ public class ChatServiceImpl implements ChatServiceGrpc.ChatServiceBlockingClien
         }
     }
 
-    @Override
     public com.if4031.proto.Rpcchat.Response leave(com.if4031.proto.Rpcchat.LeaveRequest request) {
         String nickname = request.getNickname();
         String channel = request.getChannel();
@@ -66,7 +64,6 @@ public class ChatServiceImpl implements ChatServiceGrpc.ChatServiceBlockingClien
         }
     }
 
-    @Override
     public com.if4031.proto.Rpcchat.Response send(com.if4031.proto.Rpcchat.SendRequest request) {
         String nickname = request.getNickname();
         String channel = request.getChannel();
@@ -89,7 +86,6 @@ public class ChatServiceImpl implements ChatServiceGrpc.ChatServiceBlockingClien
         }
     }
 
-    @Override
     public com.if4031.proto.Rpcchat.Response sendAll(com.if4031.proto.Rpcchat.SendAllRequest request) {
         String nickname = request.getNickname();
         String message = request.getMessage();
@@ -103,7 +99,6 @@ public class ChatServiceImpl implements ChatServiceGrpc.ChatServiceBlockingClien
                 .setStatus("OK").setMessage("Channels affected : "+channels.size()).build();
     }
 
-    @Override
     public Rpcchat.ChatResponse recvAll(Rpcchat.RecvAllRequest request) {
         String nickname = request.getNickname();
 
@@ -206,5 +201,35 @@ public class ChatServiceImpl implements ChatServiceGrpc.ChatServiceBlockingClien
             channels.add(channel);
         }
         return channels;
+    }
+
+    @Override
+    public void join(Rpcchat.JoinRequest request, StreamObserver<Rpcchat.Response> responseObserver) {
+        responseObserver.onValue(join(request));
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void leave(Rpcchat.LeaveRequest request, StreamObserver<Rpcchat.Response> responseObserver) {
+        responseObserver.onValue(leave(request));
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void send(Rpcchat.SendRequest request, StreamObserver<Rpcchat.Response> responseObserver) {
+        responseObserver.onValue(send(request));
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void sendAll(Rpcchat.SendAllRequest request, StreamObserver<Rpcchat.Response> responseObserver) {
+        responseObserver.onValue(sendAll(request));
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void recvAll(Rpcchat.RecvAllRequest request, StreamObserver<Rpcchat.ChatResponse> responseObserver) {
+        responseObserver.onValue(recvAll(request));
+        responseObserver.onCompleted();
     }
 }
