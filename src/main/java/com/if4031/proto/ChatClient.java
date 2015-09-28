@@ -106,6 +106,7 @@ public class ChatClient {
             String currNick = "paijo";
             boolean stop = false;
             do{
+                System.out.print("Command: ");
                 Scanner sc = new Scanner(System.in);
                 String str = sc.nextLine();
                 String[] splited = str.split("\\s+");
